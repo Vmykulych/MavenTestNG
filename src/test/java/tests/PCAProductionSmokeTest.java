@@ -1,5 +1,6 @@
 package tests;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -151,7 +152,8 @@ public class PCAProductionSmokeTest {
         /*System.setProperty("webdriver.gecko.driver", "C:\\Users\\viktor.mykulych\\Desktop\\Vision\\Automation\\geckodriver.exe");
         driver = new FirefoxDriver();*/
         //Create a new ChromeDriver
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\viktor.mykulych\\Desktop\\Vision\\Automation\\chromedriver.exe");
+        //System.setProperty("webdriver.chrome.driver", "C:\\Users\\viktor.mykulych\\Desktop\\Vision\\Automation\\chromedriver.exe");
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         //launch Browser and direct it to the test URL
         driver.get(pcaURL);
