@@ -7,8 +7,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class LoginPage {
-    private final WebDriver driver;
+       private final WebDriver driver;
 
     public LoginPage (WebDriver driver) {
         this.driver=driver;
@@ -65,8 +68,13 @@ public class LoginPage {
         Thread.sleep(4000);
     }
 
+
     public String getPageTitle() {
        return driver.getTitle();
     }
+
+
 }
+
+
 

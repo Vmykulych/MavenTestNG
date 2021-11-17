@@ -115,6 +115,7 @@ public class PCAProductionSmokeTest {
     AdminPage closeStorefrontTab;
     AdminPage moveToPrevTab;
     AdminPage logout;
+    RandomData randomPassword;
 
 
     //Declare test Strings
@@ -662,6 +663,18 @@ public class PCAProductionSmokeTest {
 
         //Verify Admin header elements and click logout
         logout.verifyLogout();
+
+    }
+
+    @Test //Test randomizers)
+    public void PCATest10() throws InterruptedException, AWTException {
+
+        randomPassword = new RandomData(driver);
+
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+        System.out.println(randomPassword.getRandomPassword());
+
+
 
     }
 
