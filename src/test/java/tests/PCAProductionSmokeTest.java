@@ -429,8 +429,10 @@ public class PCAProductionSmokeTest {
         moveToCartAfterUpdate.clickUpdateCart();
 
         //Check Item base price in cart
-        itemPriceInCart.getItemPriceInCart();
-        System.out.println("Item price in cart without $: " + itemPriceInCart.getItemPriceInCart());
+        itemPriceInCart.getItemPriceInCartUsingRegEx();
+//        itemPriceInCart.getItemPriceInCart();
+//        System.out.println("Item price in cart without $: " + itemPriceInCart.getItemPriceInCart());
+        System.out.println("Item price in cart without $: " + itemPriceInCart.getItemPriceInCartUsingRegEx());
 
         //Verify the Base prices on PDP and in the Cart are the same
         Assert.assertEquals(basePrice, itemPriceInCart.getItemPriceInCart());

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 public class LoginPage {
        private final WebDriver driver;
+    RandomData randomPassword;
 
     public LoginPage (WebDriver driver) {
         this.driver=driver;
@@ -50,11 +51,14 @@ public class LoginPage {
     }
 
     public void loginSuccessful(String login, String password) throws InterruptedException {
+        randomPassword = new RandomData(driver);
+
 
 
         //Find login form for user iD input
         driver.findElement(userName).sendKeys(login);
         //Find login form for Password input
+        //driver.findElement(passwordElement).sendKeys(password);
         driver.findElement(passwordElement).sendKeys(password);
         //Find Remember me checkbox, tick
         WebElement rememberMeCheckBox = driver.findElement(By.xpath("//label[@for='RememberMe']"));

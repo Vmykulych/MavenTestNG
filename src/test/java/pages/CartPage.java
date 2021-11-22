@@ -11,6 +11,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CartPage {
     private final WebDriver driver;
@@ -157,6 +159,25 @@ public class CartPage {
         int indexPrice = priceInCart.indexOf("$");
         String priceInCartIndexOff = priceInCart.substring(indexPrice + 1);
         return priceInCartIndexOff;
+
+    }
+
+    public String getItemPriceInCartUsingRegEx() {
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(pricePerItemInCart));
+        //Get the Item Price in cart and compare with Base price
+        String priceInCart = driver.findElement(pricePerItemInCart).getText();
+        System.out.println(priceInCart);
+        String RegExPrice = "(\\d+)[.]\\d{2}";
+        Pattern p = Pattern.compile(RegExPrice);
+        Matcher m = p.matcher(priceInCart);
+        if (m.find()) {
+            return m.group();
+        }
+        return null;
+
+
 
     }
 
