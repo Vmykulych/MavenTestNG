@@ -1,6 +1,7 @@
 package tests;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.logging.Log;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -19,6 +20,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 //comment the above line and uncomment below line to use Chrome
 //import org.openqa.selenium.chrome.ChromeDriver;
@@ -29,6 +31,7 @@ import java.util.List;
  *******************************************************************************/
 
 public class PCAProductionSmokeTest {
+    //PageFactory pages = new PageFactory();
 
 
     //-----------------------------------Global Variables-----------------------------------
@@ -36,85 +39,12 @@ public class PCAProductionSmokeTest {
     public WebDriver driver;
     //POM
     LoginPage loginPage;
-    LoginPage unsuccessfulLogin;
-    LoginPage emptyLoginFields;
-    LoginPage loginErrorMessage;
-    HomePageElements homePageHeaderElements;
-    HomePageElements close;
-    HomePageElements openBrowser;
-    HomePageElements homePageCatalog;
-    HomePageElements catalogWidget;
-    HomePageElements catalogWidgetSearch;
-    AccountPage accountOptions;
-    AccountPage myOrdersPage;
-    AccountPage addressBookPage;
-    AccountPage dataListPage;
-    AccountPage dataListUploading;
-    AccountPage approvalRequestsPage;
-    AccountPage gettingToPreviousPage;
-    VDPPage vdpItem;
-    VDPPage vdpItemCustomization;
-    VDPPage hoverOverPrwDwld;
-    VDPPage previewBtnColor;
-    VDPPage previewAddToCart;
-    VDPPage downloadBtnColor;
-    VDPPage backgroundOption;
-    VDPPage referenceIdValue;
-    VDPPage itemQuantity;
-    VDPPage quantityValue;
-    CartPage navigateToCart;
-    CartPage verifyCartPageTitle;
-    CartPage cartUpdateVerification;
-    CartPage productDetailPage;
-    CartPage checkPlantName;
-    CartPage checkItemBasePrice;
-    CartPage updateCartButton;
-    CartPage updateItemPreview;
-    CartPage previewSuccessful;
-    CartPage pdpItemQty;
-    CartPage moveToCartAfterUpdate;
-    CartPage itemPriceInCart;
-    CartPage cartItemQty;
-    CartPage finalQty;
-    CartPage totalValueInCart;
-    CartPage anotherItemToCart;
-    CartPage addAnotherItemToCart;
-    CartPage viewCartButton;
-    CartPage secondItemTotal;
-    CartPage subtotalValue;
-    CartPage deleteItemFromCart;
-    CartPage continueShopping;
-    CartPage returnToCart;
-    CartPage upperCheckoutBtn;
-    CartPage userProfilePage;
-    CartPage lowerCheckoutBtn;
-    CartPage cleanCartFunctionality;
-    CartPage cartEmpty;
-    CartPage cartContainsItem;
-    CheckoutPage cartSubtotal;
-    CheckoutPage navigateToCheckout;
-    CheckoutPage verifyCheckoutPageTitle;
-    CheckoutPage userProfileAddress;
-    CheckoutPage shippingAddressWidget;
-    CheckoutPage orderSummaryWidget;
-    CheckoutPage shipToDifferentAddress;
-    CheckoutPage shippingPage;
-    CheckoutPage verifyPaymentPage;
-    CheckoutPage orderSummaryList;
-    CheckoutPage paymentSubtotal;
-    CheckoutPage completeOrder;
-    AdminPage navigateToAdminPage;
-    AdminPage adminPageTitle;
-    AdminPage ordersPage;
-    AdminPage usersPage;
-    AdminPage catalogPage;
-    AdminPage productsPage;
-    AdminPage clickStorefrontPage;
-    AdminPage switchTabsList;
-    AdminPage storefrontPageTitle;
-    AdminPage closeStorefrontTab;
-    AdminPage moveToPrevTab;
-    AdminPage logout;
+    HomePageElements homePageElements;
+    AccountPage accountPage;
+    VDPPage vdpPage;
+    CartPage cartPage;
+    CheckoutPage checkoutPage;
+    AdminPage adminPage;
     RandomData randomPassword;
 
 
@@ -122,7 +52,7 @@ public class PCAProductionSmokeTest {
     public String pcaURL = "https://pcafulfillment.iprint.visionps.com/login?useACLogin=true";
 
     //LoginPage
-    String login = "vmykulych@visionps.com";
+    String userName = "vmykulych@visionps.com";
     String password = "Vision124!/Z";
     String incorrectPassword = "Test123";
     //HomePageElements
@@ -160,6 +90,7 @@ public class PCAProductionSmokeTest {
         driver.get(pcaURL);
         driver.manage().window().maximize();
 
+
     }
 
 
@@ -167,23 +98,22 @@ public class PCAProductionSmokeTest {
     @Test //Login and verification of header elements
     public void PCATest1() throws InterruptedException {
 
-        unsuccessfulLogin = new LoginPage(driver);
-        emptyLoginFields = new LoginPage(driver);
-        loginErrorMessage = new LoginPage(driver);
         loginPage = new LoginPage(driver);
 
         //Login negative scenario with incorrect password - expected result: user is not logged in
-        unsuccessfulLogin.loginError(login, incorrectPassword);
-        Assert.assertEquals(unsuccessfulLogin.getPageTitle(), "Login");
+
+        loginPage.loginError(userName, incorrectPassword);
+        loginPage.loginError(userName, incorrectPassword);
+        Assert.assertEquals(loginPage.getPageTitle(), "Login");
 
         //Verify the error message after unsuccessful login is correct
-        Assert.assertEquals(loginErrorMessage.getLoginErrorMsg(), "The sign in information you provided was incorrect. You have 5 tries remaining.");
+        Assert.assertEquals(loginPage.getLoginErrorMsg(), "The sign in information you provided was incorrect. You have 5 tries remaining.");
 
         //Clear all Login fields
-        emptyLoginFields.clearLoginFields();
+        loginPage.clearLoginFields();
 
         //Login - positive scenario - expected result: user is logged in and landed on Home Page
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Verify page title - expected "Home Page"
         //Assert page title is correct
@@ -195,14 +125,14 @@ public class PCAProductionSmokeTest {
     public void PCATest2() throws InterruptedException {
 
         loginPage = new LoginPage(driver);
-        homePageHeaderElements = new HomePageElements(driver);
+        homePageElements = new HomePageElements(driver);
 
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Verify Home Page Header Elements (Search, Cart, Catalog, User's Account, Admin, Logout)
-        homePageHeaderElements.HomepageHeader(validSku2);
+        homePageElements.HomepageHeader(validSku2);
 
     }
 
@@ -210,13 +140,13 @@ public class PCAProductionSmokeTest {
     public void PCATest3() throws InterruptedException {
 
         loginPage = new LoginPage(driver);
-        homePageCatalog = new HomePageElements(driver);
+        homePageElements = new HomePageElements(driver);
 
         //Login again
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Verify presence of Catalog body elements, tiles
-        homePageCatalog.HomePageCatalogTiles();
+        homePageElements.HomePageCatalogTiles();
 
     }
 
@@ -224,18 +154,18 @@ public class PCAProductionSmokeTest {
     public void PCATest4() throws InterruptedException {
 
         loginPage = new LoginPage(driver);
-        catalogWidget = new HomePageElements(driver);
-        catalogWidgetSearch = new HomePageElements(driver);
+        homePageElements = new HomePageElements(driver);
+
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Check all Catalog widget categories, names, click and return back
-        catalogWidget.CatalogWidgetElements();
+        homePageElements.CatalogWidgetElements();
 
-        /*Check Catalog Widget search functionality, run through categories and if category text coincides with the
-        stated one, perform click*/
-        catalogWidgetSearch.CatalogWidgetSearch(validSku3);
+//        Check Catalog Widget search functionality, run through categories and if category text coincides with the
+//        stated one, perform click
+        homePageElements.CatalogWidgetSearch(validSku3);
 
 
     }
@@ -244,63 +174,48 @@ public class PCAProductionSmokeTest {
     public void PCATest5() throws InterruptedException, AWTException {
 
         loginPage = new LoginPage(driver);
-        accountOptions = new AccountPage(driver);
-        myOrdersPage = new AccountPage(driver);
-        addressBookPage = new AccountPage(driver);
-        dataListPage = new AccountPage(driver);
-        approvalRequestsPage = new AccountPage(driver);
-        dataListUploading = new AccountPage(driver);
-        gettingToPreviousPage = new AccountPage(driver);
+        accountPage = new AccountPage(driver);
 
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Verify User's Account elements size, check they are correct. Approval Requests visible only for Admins
-        accountOptions.AccountPageElements(myApprovalsUrl);
+        accountPage.AccountPageElements(myApprovalsUrl);
 
         //Verify Orders category
-        myOrdersPage.MyOrders();
+        accountPage.MyOrders();
 
         //Find Address Book, click on it, verify page title
-        addressBookPage.MyAddressBook();
+        accountPage.MyAddressBook();
         Assert.assertEquals("My AddressBook", driver.getTitle());
 
         //Find Data List, click on it, verify page title, upload CSV file
-        dataListPage.openMyDataList();
+        accountPage.openMyDataList();
         Assert.assertEquals("My Data List", driver.getTitle());
 
         //Check Data List uploading
-        dataListUploading.uploadDataList(dataListFilePath);
+        accountPage.uploadDataList(dataListFilePath);
 
         //Find Approval Requests, click on it, verify page title is correct
-        approvalRequestsPage.approvalRequests(myApprovalsUrl);
+        accountPage.approvalRequests(myApprovalsUrl);
         Assert.assertEquals("AbleCommerce | Approval Requests", driver.getTitle());
 
         //Go to the previous page
-        gettingToPreviousPage.navigateBack();
+        accountPage.navigateBack();
 
     }
 
     @Test //Find VDP item, customize and add to the cart
     public void PCATest6() throws InterruptedException {
         loginPage = new LoginPage(driver);
-        vdpItem = new VDPPage(driver);
-        vdpItemCustomization = new VDPPage(driver);
-        hoverOverPrwDwld = new VDPPage(driver);
-        previewAddToCart = new VDPPage(driver);
-        previewBtnColor = new VDPPage(driver);
-        downloadBtnColor = new VDPPage(driver);
-        backgroundOption = new VDPPage(driver);
-        referenceIdValue = new VDPPage(driver);
-        itemQuantity = new VDPPage(driver);
-        quantityValue = new VDPPage(driver);
+        vdpPage = new VDPPage(driver);
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Search for a VDP item, open its PDP and verify the page is correct
-        vdpItem.VDPItemSearch(validSku4);
+        vdpPage.VDPItemSearch(validSku4);
         //Verify the VDP page is opened and correct
         Assert.assertEquals(driver.getTitle(), "PCA Business Cards - Expedited");
         //Print page's title
@@ -308,7 +223,7 @@ public class PCAProductionSmokeTest {
 
         //Customize the item and perform the following verifications:
         //Plant drop-down, necessary fields are pre-populated, required fields filling
-        vdpItemCustomization.ItemCustomization(firstNameValue, lastNameValue, titleValue);
+        vdpPage.ItemCustomization(firstNameValue, lastNameValue, titleValue);
 
         //Verify Preview and Download PDF functionality
         //Find and hover over preview and download pdf buttons
@@ -319,142 +234,115 @@ public class PCAProductionSmokeTest {
         //Find reference field element, verify it is not empty
         //Increase, decrease qty, set defined value
         //Get the defined qty value and print
-        hoverOverPrwDwld.hoverOver();
+        vdpPage.hoverOver();
 
         //Check Preview button color in on-hover over state
-        previewBtnColor.getPreviewBtnColor();
-        Assert.assertEquals("rgba(255, 255, 255, 1)", previewBtnColor.getPreviewBtnColor());
-        System.out.println("RGB Color:" + previewBtnColor.getPreviewBtnColor());
+        vdpPage.getPreviewBtnColor();
+        Assert.assertEquals("rgba(255, 255, 255, 1)", vdpPage.getPreviewBtnColor());
+        System.out.println("RGB Color:" + vdpPage.getPreviewBtnColor());
 
         //Check Download PDF buttons color in on-hover state
-        downloadBtnColor.getDwnlBtnColor();
-        Assert.assertEquals("rgba(255, 255, 255, 1)", downloadBtnColor.getDwnlBtnColor());
-        System.out.println("RGB Color:" + downloadBtnColor.getDwnlBtnColor());
+        vdpPage.getDwnlBtnColor();
+        Assert.assertEquals("rgba(255, 255, 255, 1)", vdpPage.getDwnlBtnColor());
+        System.out.println("RGB Color:" + vdpPage.getDwnlBtnColor());
 
         //Check item background option
-        backgroundOption.getItemBackground();
+        vdpPage.getItemBackground();
 
         //Verify item reference id is not null
-        referenceIdValue.getReferenceId();
-        Assert.assertNotNull(referenceIdValue.getReferenceId());
-        System.out.println("Reference ID:" + referenceIdValue.getReferenceId());
+        vdpPage.getReferenceId();
+        Assert.assertNotNull(vdpPage.getReferenceId());
+        System.out.println("Reference ID:" + vdpPage.getReferenceId());
 
         //Verify item qty changing functionality
-        itemQuantity.changeQuantity(qtyInputValue);
+        vdpPage.changeQuantity(qtyInputValue);
 
         //Get qty value on the item detail page
-        quantityValue.getQtyValue();
+        vdpPage.getQtyValue();
 
         //Verification Preview / Download PDF functionality, adding item to cart
-        previewAddToCart.rendering();
+        vdpPage.rendering();
 
     }
 
     @Test //Verify Cart page
     public void PCATest7() throws InterruptedException, AWTException {
         loginPage = new LoginPage(driver);
-        navigateToCart = new CartPage(driver);
-        verifyCartPageTitle = new CartPage(driver);
-        cartUpdateVerification = new CartPage(driver);
-        productDetailPage = new CartPage(driver);
-        checkPlantName = new CartPage(driver);
-        checkItemBasePrice = new CartPage(driver);
-        updateCartButton = new CartPage(driver);
-        updateItemPreview = new CartPage(driver);
-        previewSuccessful = new CartPage(driver);
-        pdpItemQty = new CartPage(driver);
-        moveToCartAfterUpdate = new CartPage(driver);
-        itemPriceInCart = new CartPage(driver);
-        cartItemQty = new CartPage(driver);
-        finalQty = new CartPage(driver);
-        totalValueInCart = new CartPage(driver);
-        anotherItemToCart = new CartPage(driver);
-        addAnotherItemToCart = new CartPage(driver);
-        viewCartButton = new CartPage(driver);
-        secondItemTotal = new CartPage(driver);
-        subtotalValue = new CartPage(driver);
-        deleteItemFromCart = new CartPage(driver);
-        continueShopping = new CartPage(driver);
-        returnToCart = new CartPage(driver);
-        upperCheckoutBtn = new CartPage(driver);
-        userProfilePage = new CartPage(driver);
-        lowerCheckoutBtn = new CartPage(driver);
-        cleanCartFunctionality = new CartPage(driver);
-        cartEmpty = new CartPage(driver);
-        cartContainsItem = new CartPage(driver);
+        cartPage = new CartPage(driver);
+
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Open cart page, check page is correct
-        navigateToCart.openCart();
+        cartPage.openCart();
 
         //Check the page is correct, get title and make assertion
-        verifyCartPageTitle.getPageTitle();
-        System.out.println("The Cart Page Title is: " + verifyCartPageTitle.getPageTitle());
-        Assert.assertEquals(verifyCartPageTitle.getPageTitle(), "Basket", "Title assertion is failed!");
+        cartPage.getPageTitle();
+        System.out.println("The Cart Page Title is: " + cartPage.getPageTitle());
+        Assert.assertEquals(cartPage.getPageTitle(), "Basket", "Title assertion is failed!");
 
         //Open Item PDP from Cart
-        productDetailPage.getToPdpFromCart();
+        cartPage.getToPdpFromCart();
 
         //Verify previously set up fields are pre-populated
-        checkPlantName.getPlantName();
+        cartPage.getPlantName();
 
-        System.out.println("Plant Name is:" + checkPlantName.getPlantName());
-        Assert.assertNotNull(checkPlantName.getPlantName());
+        System.out.println("Plant Name is:" + cartPage.getPlantName());
+        Assert.assertNotNull(cartPage.getPlantName());
 
         //Get Item base price from PDP to compare with the one on Cart page
-        checkItemBasePrice.getItemBasePrice();
-        System.out.println("PCA Business Cards - Expedited price is: " + checkItemBasePrice.getItemBasePrice());
-        String basePrice = checkItemBasePrice.getItemBasePrice();
+        cartPage.getItemBasePrice();
+        System.out.println("PCA Business Cards - Expedited price is: " + cartPage.getItemBasePrice());
+        String basePrice = cartPage.getItemBasePrice();
 
         //Verify Add To Cart button is now changed to Update Cart
-        updateCartButton.updateCart();
-        System.out.println(updateCartButton.updateCart());
-        Assert.assertEquals("UpdateCart", updateCartButton.updateCart());
+        cartPage.updateCart();
+        System.out.println(cartPage.updateCart());
+        Assert.assertEquals("UpdateCart", cartPage.updateCart());
 
         //Verify Preview functionality after item update
-        updateItemPreview.getUpdatedItemPreview();
+        cartPage.getUpdatedItemPreview();
 
         //Confirm the preview was successful, check success message
-        previewSuccessful.getSuccessMessage();
-        Assert.assertEquals("Your preview is ready. Hover over image to zoom.", previewSuccessful.getSuccessMessage());
+        cartPage.getSuccessMessage();
+        Assert.assertEquals("Your preview is ready. Hover over image to zoom.", cartPage.getSuccessMessage());
         Thread.sleep(2000);
 
         //Check item qty on PDP to compare with the one on Cart page
-        pdpItemQty.getItemQtyOnPdp();
-        String pdpItemQuantity = pdpItemQty.getItemQtyOnPdp();
+        cartPage.getItemQtyOnPdp();
+        String pdpItemQuantity = cartPage.getItemQtyOnPdp();
 
         //Check user can move back to cart after successful cart update
-        moveToCartAfterUpdate.clickUpdateCart();
+        cartPage.clickUpdateCart();
 
         //Check Item base price in cart
-        itemPriceInCart.getItemPriceInCartUsingRegEx();
+        cartPage.getItemPriceInCartUsingRegEx();
 //        itemPriceInCart.getItemPriceInCart();
 //        System.out.println("Item price in cart without $: " + itemPriceInCart.getItemPriceInCart());
-        System.out.println("Item price in cart without $: " + itemPriceInCart.getItemPriceInCartUsingRegEx());
+        System.out.println("Item price in cart without $: " + cartPage.getItemPriceInCartUsingRegEx());
 
         //Verify the Base prices on PDP and in the Cart are the same
-        Assert.assertEquals(basePrice, itemPriceInCart.getItemPriceInCart());
+        Assert.assertEquals(basePrice, cartPage.getItemPriceInCart());
 
         //Check item qty on the cart page to compare with the one on PDP
-        cartItemQty.getItemQtyOnCartPage();
+        cartPage.getItemQtyOnCartPage();
 
         //Compare PDP and Cart qty - expected result: Qty is the same
-        Assert.assertEquals(pdpItemQuantity, cartItemQty.getItemQtyOnCartPage());
+        Assert.assertEquals(pdpItemQuantity, cartPage.getItemQtyOnCartPage());
 
         //Get cart final qty
-        finalQty.getCartQty();
-        System.out.println("Quantity in cart value: " + finalQty.getCartQty());
+        cartPage.getCartQty();
+        System.out.println("Quantity in cart value: " + cartPage.getCartQty());
 
         //Verify total value in cart
-        totalValueInCart.getTotalValueInCart();
+        cartPage.getTotalValueInCart();
         //Convert String totalIndexOff to double value
-        double totIndOff = Double.parseDouble(totalValueInCart.getTotalValueInCart());
+        double totIndOff = Double.parseDouble(cartPage.getTotalValueInCart());
         //Convert String quantity to double value
-        double qtyInCrt = Double.parseDouble(finalQty.getCartQty());
+        double qtyInCrt = Double.parseDouble(cartPage.getCartQty());
         //Convert String priceInCartIndexOff to double value
-        double prcIndOff = Double.parseDouble(itemPriceInCart.getItemPriceInCart());
+        double prcIndOff = Double.parseDouble(cartPage.getItemPriceInCart());
 
         //Multiply Price by Quantity
         double total = prcIndOff * qtyInCrt;
@@ -463,72 +351,72 @@ public class PCAProductionSmokeTest {
         Assert.assertEquals(totIndOff, total);
 
         //Search for another item
-        anotherItemToCart.searchAnotherItem(validSku3);
+        cartPage.searchAnotherItem(validSku3);
 
         //Add another item to the cart
-        addAnotherItemToCart.addToCart();
+        cartPage.addToCart();
 
         //Verify View cart functionality
-        viewCartButton.clickViewCartButton();
+        cartPage.clickViewCartButton();
 
         //Get second item total
-        secondItemTotal.getSecondItemTotal();
-        System.out.println("Second item price without $: " + secondItemTotal.getSecondItemTotal());
+        cartPage.getSecondItemTotal();
+        System.out.println("Second item price without $: " + cartPage.getSecondItemTotal());
 
         //Get subtotal value
-        subtotalValue.getSubtotalValue();
+        cartPage.getSubtotalValue();
 
         //Add 1st and 2nd items totals and compare with subtotal > the result should be the same
-        double overAllTotal = totIndOff + secondItemTotal.getSecondItemTotal();
+        double overAllTotal = totIndOff + cartPage.getSecondItemTotal();
         System.out.println("1st and 2nd items total sum is: " + overAllTotal);
-        Assert.assertEquals(overAllTotal, subtotalValue.getSubtotalValue());
+        Assert.assertEquals(overAllTotal, cartPage.getSubtotalValue());
         Thread.sleep(3000);
 
         //Verify user can delete item from cart - delete the second item
-        deleteItemFromCart.deleteSecondItem();
+        cartPage.deleteSecondItem();
 
         //Find Continue Shopping Button verify it works correctly (redirects to the Home Page)
-        continueShopping.verifyContinueShopping();
+        cartPage.verifyContinueShopping();
 
         //Return to shopping cart page
-        returnToCart.navigateBack();
+        cartPage.navigateBack();
 
         //Verify upper checkout button is clickable
-        upperCheckoutBtn.clickUpperCheckoutBtn();
+        cartPage.clickUpperCheckoutBtn();
 
         //Verify once upper checkout is clicked, user is redirected to correct page "Checkout - Edit Billing Address"
-        userProfilePage.getUserProfileTitle();
+        cartPage.getUserProfileTitle();
         //Assert page is the one as expected
-        Assert.assertEquals(userProfilePage.getUserProfileTitle(), "Checkout - Edit Billing Address");
+        Assert.assertEquals(cartPage.getUserProfileTitle(), "Checkout - Edit Billing Address");
         Thread.sleep(2000);
 
         //Return to shopping cart page
-        returnToCart.navigateBack();
+        cartPage.navigateBack();
         Thread.sleep(3000);
 
         //Verify lower checkout button is clickable
-        lowerCheckoutBtn.clickLowerCheckoutBtn();
+        cartPage.clickLowerCheckoutBtn();
 
         //Verify once upper checkout is clicked, user is redirected to correct page "Checkout - Edit Billing Address"
-        userProfilePage.getUserProfileTitle();
+        cartPage.getUserProfileTitle();
         //Assert page is the one as expected
-        Assert.assertEquals(userProfilePage.getUserProfileTitle(), "Checkout - Edit Billing Address");
+        Assert.assertEquals(cartPage.getUserProfileTitle(), "Checkout - Edit Billing Address");
         Thread.sleep(2000);
 
         //Return to shopping cart page
-        returnToCart.navigateBack();
+        cartPage.navigateBack();
         Thread.sleep(3000);
 
         //Verify user can clean cart using "Clean Cart" button
-        cleanCartFunctionality.verifyCleanCart();
+        cartPage.verifyCleanCart();
 
         //Verify the cart is empty
-        cartEmpty.getCartEmptyMessage();
-        Assert.assertEquals(cartEmpty.getCartEmptyMessage(), "Your shopping cart is empty.");
+        cartPage.getCartEmptyMessage();
+        Assert.assertEquals(cartPage.getCartEmptyMessage(), "Your shopping cart is empty.");
         Thread.sleep(3000);
 
         //Add item to the cart again to bring the cart to initial state
-        cartContainsItem.getItemToCart(validSku2, firstNameValue, lastNameValue, titleValue);
+        cartPage.getItemToCart(validSku2, firstNameValue, lastNameValue, titleValue);
 
     }
 
@@ -536,70 +424,59 @@ public class PCAProductionSmokeTest {
     public void PCATest8() throws InterruptedException, AWTException {
 
         loginPage = new LoginPage(driver);
-        navigateToCart = new CartPage(driver);
-        cartSubtotal = new CheckoutPage(driver);
-        navigateToCheckout = new CheckoutPage(driver);
-        verifyCheckoutPageTitle = new CheckoutPage(driver);
-        shippingAddressWidget = new CheckoutPage(driver);
-        orderSummaryWidget = new CheckoutPage(driver);
-        shipToDifferentAddress = new CheckoutPage(driver);
-        orderSummaryList = new CheckoutPage(driver);
-        paymentSubtotal = new CheckoutPage(driver);
-        userProfileAddress = new CheckoutPage(driver);
-        shippingPage = new CheckoutPage(driver);
-        verifyPaymentPage = new CheckoutPage(driver);
-        completeOrder = new CheckoutPage(driver);
+        cartPage = new CartPage(driver);
+        checkoutPage = new CheckoutPage(driver);
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Open cart page, check page is correct
-        navigateToCart.openCart();
+        cartPage.openCart();
 
         //Open cart page, verify title, get subtotal, convert to boolean
-        cartSubtotal.getCartSubtotal();
+        checkoutPage.getCartSubtotal();
         //Convert String cartSubIndexOff to double
-        double dCartSubIndexOff = Double.parseDouble(cartSubtotal.getCartSubtotal());
+        double dCartSubIndexOff = Double.parseDouble(checkoutPage.getCartSubtotal());
 
         //Verify user is able to proceed to Checkout page
-        navigateToCheckout.proceedToCheckout();
+        checkoutPage.proceedToCheckout();
 
         //Verify user is on the right page
-        verifyCheckoutPageTitle.getPageTitle();
-        Assert.assertEquals(verifyCheckoutPageTitle.getPageTitle(), "Checkout - Edit Billing Address");
+        checkoutPage.getPageTitle();
+        Assert.assertEquals(checkoutPage.getPageTitle(), "Checkout - Edit Billing Address");
 
         //Check User Profile page
-        userProfileAddress.verifyUserProfileAddress();
+        checkoutPage.verifyUserProfileAddress();
 
         //Check Shipping Address widget functionality
-        shippingAddressWidget.verifyShippingAddressWidget();
+        checkoutPage.verifyShippingAddressWidget();
 
         //Check Order Summary widget functionality
-        orderSummaryWidget.verifyOrderSummaryWidget();
+        checkoutPage.verifyOrderSummaryWidget();
 
         //Check Ship to a different address functionality
-        shipToDifferentAddress.verifyShipToDifferentAddress();
+        checkoutPage.verifyShipToDifferentAddress();
 
         //Check Shipping Page
-        shippingPage.verifyShippingPage();
+        checkoutPage.verifyShippingPage();
 
         //Move to Payment page and check it is correct
-        verifyPaymentPage.getPaymentPageTitle();
-        Assert.assertEquals(verifyPaymentPage.getPaymentPageTitle(), "Checkout - Confirm and Pay");
+        checkoutPage.getPaymentPageTitle();
+        Assert.assertEquals(checkoutPage.getPaymentPageTitle(), "Checkout - Confirm and Pay");
 
         //Get order summary list
-        orderSummaryList.verifyOrderSummaryList();
+        checkoutPage.verifyOrderSummaryList();
 
         //Verify Payment subtotal is correct and the same as in the cart
-        paymentSubtotal.getPaymentSubtotal();
+        checkoutPage.getPaymentSubtotal();
         //Convert String cartSubIndexOff to double
-        double dPaymentSubIndexOff = Double.parseDouble(paymentSubtotal.getPaymentSubtotal());
+        double dPaymentSubIndexOff = Double.parseDouble(checkoutPage.getPaymentSubtotal());
         //Assert two booleans cart subtotal equals payment subtotal
         Assert.assertEquals(dCartSubIndexOff, dPaymentSubIndexOff);
 
         //Verify Complete Order functionality, CC information
         //Make sure order was not complete due to CC invalidity
-        completeOrder.verifyCompleteOrder(cardData, masterCardNumber, masterCardCvv);
+        checkoutPage.verifyCompleteOrder(cardData, masterCardNumber, masterCardCvv);
 
     }
 
@@ -607,64 +484,53 @@ public class PCAProductionSmokeTest {
     public void PCATest9() throws InterruptedException, AWTException {
 
         loginPage = new LoginPage(driver);
-        navigateToAdminPage = new AdminPage(driver);
-        adminPageTitle = new AdminPage(driver);
-        ordersPage = new AdminPage(driver);
-        usersPage = new AdminPage(driver);
-        catalogPage = new AdminPage(driver);
-        productsPage = new AdminPage(driver);
-        clickStorefrontPage = new AdminPage(driver);
-        switchTabsList = new AdminPage(driver);
-        storefrontPageTitle = new AdminPage(driver);
-        closeStorefrontTab = new AdminPage(driver);
-        moveToPrevTab = new AdminPage(driver);
-        logout = new AdminPage(driver);
+        adminPage = new AdminPage(driver);
 
         WebDriverWait wait = new WebDriverWait(driver, 15);
 
         //Login
-        loginPage.loginSuccessful(login, password);
+        loginPage.loginSuccessful(userName, password);
 
         //Verify user with admin rights can navigate to admin side
-        navigateToAdminPage.openAdminPage();
+        adminPage.openAdminPage();
 
         //Verify admin page is correct - verify page title
-        adminPageTitle.getAdminPageTitle();
-        Assert.assertEquals(adminPageTitle.getAdminPageTitle(), "AbleCommerce | Dashboard");
+        adminPage.getAdminPageTitle();
+        Assert.assertEquals(adminPage.getAdminPageTitle(), "AbleCommerce | Dashboard");
 
         //Verify Orders page is correct on the admin side - check page title
-        ordersPage.verifyOrdersPage();
-        Assert.assertEquals(ordersPage.verifyOrdersPage(), "AbleCommerce | Orders");
+        adminPage.verifyOrdersPage();
+        Assert.assertEquals(adminPage.verifyOrdersPage(), "AbleCommerce | Orders");
 
         //Verify Users page is correct on the admin side - check page title
-        usersPage.verifyUsersPage();
-        Assert.assertEquals(usersPage.verifyUsersPage(), "AbleCommerce | Users");
+        adminPage.verifyUsersPage();
+        Assert.assertEquals(adminPage.verifyUsersPage(), "AbleCommerce | Users");
 
         //Verify Catalog page is correct on the admin side - check page title
-        catalogPage.verifyCatalogPage();
-        Assert.assertEquals(catalogPage.verifyCatalogPage(), "AbleCommerce | Manage Catalog");
+        adminPage.verifyCatalogPage();
+        Assert.assertEquals(adminPage.verifyCatalogPage(), "AbleCommerce | Manage Catalog");
 
         //Verify Products page is correct on the admin side - check page title
-        productsPage.verifyProductsPage();
-        Assert.assertEquals(productsPage.verifyProductsPage(), "AbleCommerce | Manage Products");
+        adminPage.verifyProductsPage();
+        Assert.assertEquals(adminPage.verifyProductsPage(), "AbleCommerce | Manage Products");
 
         //Verify Storefront Page - it opens in a new tab
-        clickStorefrontPage.getStorefrontPage();
+        adminPage.getStorefrontPage();
 
         //Get the list of tabs, switch tabs
-        switchTabsList.getTabsList();
+        adminPage.getTabsList();
 
         //Verify user is redirected to the Home page after clicking the Storefront in admin
-        storefrontPageTitle.getStorefrontPageTitle();
+        adminPage.getStorefrontPageTitle();
 
         //Close Storefront tab in browser - expected result the tab is closed
-        closeStorefrontTab.closeTab();
+        adminPage.closeTab();
 
         //Return to the previous tab
-        moveToPrevTab.switchToPrevTab();
+        adminPage.switchToPrevTab();
 
         //Verify Admin header elements and click logout
-        logout.verifyLogout();
+        adminPage.verifyLogout();
 
     }
 
@@ -679,6 +545,7 @@ public class PCAProductionSmokeTest {
 
 
     }
+
 
     //-----------------------------------Test TearDown-----------------------------------
     @AfterMethod
